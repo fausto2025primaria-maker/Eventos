@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Llançador Medieval ULTRA PRO V6</title>
+<style>
+body{
+  margin:0;
+  background:#120a06;
+  font-family:Georgia, serif;
+  color:white;
+  text-align:center;
+}
+
+h1{
+  margin:20px;
+  font-size:2.5rem;
+}
+
+.container{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.flip-card{
+  background:transparent;
+  width:90%;
+  max-width:800px;
+  height:1100px;
+  perspective:1400px;
+  margin:20px auto 8px auto;
+  transition:box-shadow .25s ease;
+}
+
+.flip-card-inner{
+  position:relative;
+  width:100%;
+  height:100%;
+  text-align:center;
+  transition:transform 0.95s ease;
+  transform-style:preserve-3d;
+}
+
+.flip-card.flipped .flip-card-inner{
+  transform:rotateY(180deg);
+}
+
+.flip-card.shake .flip-card-inner{
+  animation:shakeCard .25s linear 2;
+}
+
+@keyframes shakeCard{
+  0%{transform:translateX(0);}
+  25%{transform:translateX(-6px);}
+  50%{transform:translateX(6px);}
+  75%{transform:translateX(-4px);}
+  100%{transform:translateX(0);}
+}
+
+.flip-card-front,
+.flip-card-back{
+  position:absolute;
+  width:100%;
+  height:100%;
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 15px 40px rgba(0,0,0,0.5);
+}
+
+.flip-card-front{
+  background:#f4e7c2;
+  color:#2b1b12;
+  transform:rotateY(180deg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.flip-card-front img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:#f4e7c2;
+}
+
+.flip-card-back{
+  background-image:url('Dorso.jpg');
+  background-size:cover;
+  background-position:center;
+  border:4px solid #c9a24d;
+  position:relative;
+}
+
+.flip-card-back::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.22) 45%, transparent 70%);
+  transform:translateX(-120%);
+  animation:shine 3.4s linear infinite;
+  pointer-events:none;
+}
+
+@keyframes shine{
+  0%{transform:translateX(-120%);}
+  100%{transform:translateX(120%);}
+}
+
+.crisi{ box-shadow:0 0 26px rgba(192,57,43,.78); }
+.economia{ box-shadow:0 0 26px rgba(39,174,96,.78); }
+.social{ box-shadow:0 0 26px rgba(241,196,15,.78); }
+.militar{ box-shadow:0 0 26px rgba(44,62,80,.88); }
+
+.buttons{
+  display:flex;
+  gap:15px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin:20px;
+}
+
+button{
+  padding:15px 25px;
+  font-size:1.2rem;
+  background:#8e241b;
+  color:white;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#b83227;
+}
+
+.info-wrap{
+  width:90%;
+  max-width:800px;
+}
+
+#tipusBarra{
+  margin:6px auto 8px auto;
+  height:12px;
+  width:100%;
+  border-radius:999px;
+  background:#6b5b53;
+  box-shadow:inset 0 1px 4px rgba(0,0,0,.35);
+}
+
+#tipusEtiqueta{
+  display:inline-block;
+  margin-top:6px;
+  padding:7px 14px;
+  border-radius:999px;
+  font-size:1rem;
+  font-weight:bold;
+  color:#fff;
+  background:#6b5b53;
+}
+
+.status{
+  margin:12px 0 20px 0;
+  font-size:1rem;
+  color:#f0e4c5;
+  min-height:1.4em;
+}
+
+@media (max-width: 900px){
+  .flip-card{ height:900px; }
+}
+
+@media (max-width: 650px){
+  h1{ font-size:2rem; }
+  .flip-card{ height:700px; }
+  button{ font-size:1rem; padding:13px 18px; }
+}
+</style>
+</head>
+<body>
+
+<h1>🎴 Cartes d’esdeveniment</h1>
+
+<div class="container">
+  <div class="flip-card" id="flipCard">
+    <div class="flip-card-inner">
+      <div class="flip-card-front" id="cardFront">
+        <img id="cardImage" src="" alt="Carta medieval">
+      </div>
+      <div class="flip-card-back"></div>
+    </div>
+  </div>
+
+  <div class="info-wrap">
+    <div id="tipusEtiqueta">Preparat</div>
+    <div id="tipusBarra"></div>
+  </div>
+
+  <div class="buttons">
+    <button onclick="draw()">Llançar carta</button>
+    <button onclick="showBack()">Tornar al dors</button>
+    <button onclick="toggleFullscreen()">Pantalla completa</button>
+  </div>
+
+  <div class="status" id="status">Esperant la primera carta...</div>
+</div>
+
+<audio id="sound" src="flip.mp3"></audio>
+
+<script>
+const cards = [
+  {img:["Hivern.png","hivern.png","Hivern.jpg","hivern.jpg"], nom:"Hivern dur", tipus:"crisi"},
+  {img:["Malaltia.png","malaltia.png","Malaltia.jpg","malaltia.jpg"], nom:"Malaltia", tipus:"crisi"},
+  {img:["Impostos.png","impostos.png","Impostos.jpg","impostos.jpg"], nom:"Impostos reials", tipus:"economia"},
+  {img:["Guerra.png","guerra.png","Guerra.jpg","guerra.jpg"], nom:"Guerra", tipus:"militar"},
+  {img:["Collita.png","collita.png","Collita.jpg","collita.jpg"], nom:"Collita excel·lent", tipus:"economia"},
+  {img:["Clergat.png","clergat.png","Clergat.jpg","clergat.jpg"], nom:"Ajuda del clergat", tipus:"social"},
+  {img:["Rebelio.png","rebelio.png","Rebelio.jpg","rebelio.jpg"], nom:"Rebel·lió camperola", tipus:"crisi"},
+  {img:["Festa.png","festa.png","Festa.jpg","festa.jpg"], nom:"Festa al regne", tipus:"social"},
+  {img:["Caos.png","caos.png","Caos.jpg","caos.jpg"], nom:"Any de caos", tipus:"crisi"},
+  {img:["Traicio.png","traicio.png","Traicio.jpg","traicio.jpg"], nom:"Traïció", tipus:"militar"},
+  {img:["Mercat.png","mercat.png","Mercat.jpg","mercat.jpg"], nom:"Mercat", tipus:"economia"},
+  {img:["Noble.png","noble.png","Noble.jpg","noble.jpg"], nom:"Permanença del noble", tipus:"social"}
+];
+
+const flipCard = document.getElementById("flipCard");
+const cardImage = document.getElementById("cardImage");
+const statusText = document.getElementById("status");
+const sound = document.getElementById("sound");
+const tipusBarra = document.getElementById("tipusBarra");
+const tipusEtiqueta = document.getElementById("tipusEtiqueta");
+
+const colors = {
+  crisi: "#c0392b",
+  economia: "#27ae60",
+  social: "#f1c40f",
+  militar: "#2c3e50"
+};
+
+const labels = {
+  crisi: "Crisi",
+  economia: "Economia",
+  social: "Social",
+  militar: "Militar"
+};
+
+let lastIndex = -1;
+
+function getRandomCardIndex(){
+  if(cards.length <= 1) return 0;
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * cards.length);
+  } while (idx === lastIndex);
+  lastIndex = idx;
+  return idx;
+}
+
+function updateTipusUI(c){
+  const color = colors[c.tipus] || "#6b5b53";
+  tipusBarra.style.background = color;
+  tipusEtiqueta.style.background = color;
+  tipusEtiqueta.textContent = labels[c.tipus] || "Carta";
+  flipCard.classList.remove("crisi","economia","social","militar");
+  if(c.tipus) flipCard.classList.add(c.tipus);
+}
+
+function loadImage(c, onDone, onFail){
+  const possibles = Array.isArray(c.img) ? c.img : [c.img];
+  let i = 0;
+
+  function prova(){
+    if(i >= possibles.length){
+      onFail(possibles);
+      return;
+    }
+
+    const ruta = possibles[i];
+    const tester = new Image();
+    tester.onload = function(){
+      cardImage.src = ruta;
+      cardImage.alt = c.nom;
+      onDone(ruta);
+    };
+    tester.onerror = function(){
+      i++;
+      prova();
+    };
+    tester.src = ruta;
+  }
+
+  prova();
+}
+
+function draw(){
+  const c = cards[getRandomCardIndex()];
+
+  flipCard.classList.remove("flipped");
+  flipCard.classList.add("shake");
+  updateTipusUI(c);
+
+  setTimeout(() => {
+    flipCard.classList.remove("shake");
+
+    loadImage(
+      c,
+      function(rutaBona){
+        statusText.textContent = "Carta actual: " + c.nom + " · Imatge: " + rutaBona;
+        try {
+          sound.currentTime = 0;
+          sound.play();
+        } catch(e) {}
+        flipCard.classList.add("flipped");
+      },
+      function(possibles){
+        statusText.textContent = "No s'ha trobat la imatge de “" + c.nom + "”. Provades: " + possibles.join(", ");
+        flipCard.classList.add("flipped");
+      }
+    );
+  }, 350);
+}
+
+function showBack(){
+  flipCard.classList.remove("flipped","crisi","economia","social","militar");
+  tipusBarra.style.background = "#6b5b53";
+  tipusEtiqueta.style.background = "#6b5b53";
+  tipusEtiqueta.textContent = "Preparat";
+  statusText.textContent = "Has tornat al dors de la carta.";
+}
+
+function toggleFullscreen(){
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+</script>
+
+</body>
+</html>

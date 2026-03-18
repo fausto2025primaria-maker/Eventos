@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Llançador Medieval V7</title>
+<style>
+body{
+  margin:0;
+  background:#120a06;
+  font-family:Georgia, serif;
+  color:white;
+  text-align:center;
+}
+
+h1{
+  margin:20px 20px 8px;
+  font-size:2.4rem;
+}
+
+.sub{
+  color:#e8d7ae;
+  margin-bottom:10px;
+}
+
+.container{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:0 12px 24px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(100px,160px));
+  gap:12px;
+  margin:8px auto 16px;
+  width:min(920px,95%);
+}
+
+.stat{
+  background:#2b1b12;
+  border:2px solid #c9a24d;
+  border-radius:12px;
+  padding:10px;
+  box-shadow:0 8px 18px rgba(0,0,0,.25);
+}
+
+.stat .label{
+  font-size:.95rem;
+  color:#f0e4c5;
+}
+
+.stat .value{
+  font-size:1.6rem;
+  font-weight:bold;
+  margin-top:4px;
+}
+
+.flip-card{
+  background:transparent;
+  width:90%;
+  max-width:800px;
+  height:1100px;
+  perspective:1400px;
+  margin:10px auto 20px;
+}
+
+.flip-card-inner{
+  position:relative;
+  width:100%;
+  height:100%;
+  text-align:center;
+  transition:transform .95s ease;
+  transform-style:preserve-3d;
+}
+
+.flip-card.flipped .flip-card-inner{ transform:rotateY(180deg); }
+.flip-card.shake .flip-card-inner{ animation:shakeCard .25s linear 2; }
+
+@keyframes shakeCard{
+  0%{transform:translateX(0);} 25%{transform:translateX(-6px);} 50%{transform:translateX(6px);} 75%{transform:translateX(-4px);} 100%{transform:translateX(0);}
+}
+
+.flip-card-front,
+.flip-card-back{
+  position:absolute;
+  width:100%;
+  height:100%;
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 15px 40px rgba(0,0,0,.5);
+}
+
+.flip-card-front{
+  background:#f4e7c2;
+  color:#2b1b12;
+  transform:rotateY(180deg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+
+.flip-card-front img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:#f4e7c2;
+}
+
+.front-fallback{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  padding:40px;
+  background:radial-gradient(circle at center,#f4e7c2 0%, #e4d1a0 100%);
+}
+
+.front-fallback.show{ display:flex; }
+
+.front-title{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  padding:18px 16px;
+  background:linear-gradient(to top, rgba(18,10,6,.88), rgba(18,10,6,.05));
+  color:#fff4d4;
+  font-size:1.35rem;
+  letter-spacing:.3px;
+}
+
+.tipus-badge{
+  position:absolute;
+  top:16px;
+  right:16px;
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:.95rem;
+  font-weight:bold;
+  color:white;
+  box-shadow:0 6px 16px rgba(0,0,0,.25);
+}
+
+.flip-card-back{
+  background-image:url('Dorso.jpg');
+  background-size:cover;
+  background-position:center;
+  border:4px solid #c9a24d;
+  position:relative;
+}
+
+.flip-card-back::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,.22) 45%, transparent 70%);
+  transform:translateX(-120%);
+  animation:shine 3.4s linear infinite;
+  pointer-events:none;
+}
+
+@keyframes shine{ 0%{transform:translateX(-120%);} 100%{transform:translateX(120%);} }
+
+.buttons{
+  display:flex;
+  gap:15px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin:4px 0 18px;
+}
+
+button{
+  padding:15px 22px;
+  font-size:1.05rem;
+  background:#8e241b;
+  color:white;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+button:hover{ background:#b83227; }
+
+.status, .history{
+  width:min(900px,95%);
+  margin:0 auto 10px;
+  font-size:1rem;
+  color:#f0e4c5;
+  min-height:1.4em;
+}
+
+.history{
+  background:#2b1b12;
+  border:1px solid rgba(201,162,77,.45);
+  border-radius:12px;
+  padding:12px 14px;
+  text-align:left;
+}
+
+.history h3{
+  margin:0 0 8px;
+  color:#fff4d4;
+}
+
+#historyList{ margin:0; padding-left:20px; }
+#historyList li{ margin:5px 0; }
+
+.crisi{ box-shadow:0 0 20px rgba(192,57,43,.65); }
+.economia{ box-shadow:0 0 20px rgba(39,174,96,.65); }
+.social{ box-shadow:0 0 20px rgba(241,196,15,.65); }
+.militar{ box-shadow:0 0 20px rgba(44,62,80,.8); }
+
+@media (max-width: 900px){ .flip-card{ height:900px; } }
+@media (max-width: 700px){
+  h1{ font-size:2rem; }
+  .flip-card{ height:700px; }
+  .stats{ grid-template-columns:repeat(2,minmax(120px,1fr)); }
+}
+</style>
+</head>
+<body>
+<h1>🎴 Cartes d’esdeveniment V7</h1>
+<div class="sub">Versió estable: canvia de carta, mostra recursos i usa els noms exactes del repo.</div>
+
+<div class="container">
+  <div class="stats">
+    <div class="stat"><div class="label">💰 Tresor</div><div class="value" id="orValue">10</div></div>
+    <div class="stat"><div class="label">👥 Poble</div><div class="value" id="pobleValue">10</div></div>
+    <div class="stat"><div class="label">⛪ Fe</div><div class="value" id="feValue">10</div></div>
+    <div class="stat"><div class="label">⚔️ Exèrcit</div><div class="value" id="exercitValue">10</div></div>
+  </div>
+
+  <div class="flip-card" id="flipCard">
+    <div class="flip-card-inner">
+      <div class="flip-card-front" id="cardFront">
+        <img id="cardImage" src="" alt="Carta medieval">
+        <div class="front-fallback" id="fallbackBox">
+          <div style="font-size:2.4rem; margin-bottom:14px;">🃏</div>
+          <div style="font-size:1.4rem; font-weight:bold;">No s'ha trobat la imatge</div>
+          <div id="fallbackFile" style="margin-top:10px; font-size:1rem;"></div>
+        </div>
+        <div class="tipus-badge" id="tipusBadge">tipus</div>
+        <div class="front-title" id="frontTitle">Carta</div>
+      </div>
+      <div class="flip-card-back"></div>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button onclick="draw()">Llançar carta</button>
+    <button onclick="showBack()">Tornar al dors</button>
+    <button onclick="resetGame()">Reiniciar regne</button>
+    <button onclick="toggleFullscreen()">Pantalla completa</button>
+  </div>
+
+  <div class="status" id="status">Esperant la primera carta...</div>
+
+  <div class="history">
+    <h3>Crònica del regne</h3>
+    <ol id="historyList"></ol>
+  </div>
+</div>
+
+<audio id="sound" src="flip.mp3"></audio>
+
+<script>
+const cards = [
+  {img:"Caos.png", nom:"Any de caos", tipus:"crisi", efectes:{or:-2,poble:-2,fe:-1,exercit:-1}},
+  {img:"Festa.png", nom:"Festa al regne", tipus:"social", efectes:{or:-1,poble:+2,fe:+1,exercit:0}},
+  {img:"Mercat.png", nom:"Mercat", tipus:"economia", efectes:{or:+3,poble:+1,fe:0,exercit:0}},
+  {img:"Rebelio.png", nom:"Rebel·lió camperola", tipus:"crisi", efectes:{or:-1,poble:-2,fe:-1,exercit:-2}},
+  {img:"Traicio.png", nom:"Traïció", tipus:"militar", efectes:{or:-1,poble:-1,fe:-1,exercit:-3}},
+  {img:"Cru.jpeg", nom:"Cruesa de la guerra", tipus:"militar", efectes:{or:-2,poble:-1,fe:0,exercit:+1}},
+  {img:"Decla.jpeg", nom:"Declaració solemne", tipus:"social", efectes:{or:0,poble:+1,fe:+2,exercit:0}},
+  {img:"Decret.jpeg", nom:"Decret reial", tipus:"economia", efectes:{or:+1,poble:0,fe:+1,exercit:+1}}
+];
+
+const colors = {
+  crisi: "#c0392b",
+  economia: "#27ae60",
+  social: "#d4ac0d",
+  militar: "#2c3e50"
+};
+
+const flipCard = document.getElementById("flipCard");
+const cardImage = document.getElementById("cardImage");
+const statusText = document.getElementById("status");
+const sound = document.getElementById("sound");
+const fallbackBox = document.getElementById("fallbackBox");
+const fallbackFile = document.getElementById("fallbackFile");
+const frontTitle = document.getElementById("frontTitle");
+const tipusBadge = document.getElementById("tipusBadge");
+const historyList = document.getElementById("historyList");
+
+let stats = {or:10, poble:10, fe:10, exercit:10};
+let lastIndex = -1;
+let busy = false;
+
+function clamp(v){ return Math.max(0, Math.min(30, v)); }
+function formatDelta(n){ return n > 0 ? `+${n}` : `${n}`; }
+
+function updateStats(){
+  document.getElementById("orValue").textContent = stats.or;
+  document.getElementById("pobleValue").textContent = stats.poble;
+  document.getElementById("feValue").textContent = stats.fe;
+  document.getElementById("exercitValue").textContent = stats.exercit;
+}
+
+function getRandomCardIndex(){
+  if(cards.length <= 1) return 0;
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * cards.length);
+  } while (idx === lastIndex);
+  lastIndex = idx;
+  return idx;
+}
+
+function addHistory(text){
+  const li = document.createElement("li");
+  li.textContent = text;
+  historyList.prepend(li);
+  while(historyList.children.length > 8){
+    historyList.removeChild(historyList.lastChild);
+  }
+}
+
+function applyCardEffects(card){
+  stats.or = clamp(stats.or + card.efectes.or);
+  stats.poble = clamp(stats.poble + card.efectes.poble);
+  stats.fe = clamp(stats.fe + card.efectes.fe);
+  stats.exercit = clamp(stats.exercit + card.efectes.exercit);
+  updateStats();
+
+  const resum = `${card.nom}: or ${formatDelta(card.efectes.or)}, poble ${formatDelta(card.efectes.poble)}, fe ${formatDelta(card.efectes.fe)}, exèrcit ${formatDelta(card.efectes.exercit)}`;
+  addHistory(resum);
+  statusText.textContent = "Carta actual: " + resum;
+}
+
+function paintType(card){
+  flipCard.className = "flip-card " + card.tipus;
+  tipusBadge.textContent = card.tipus;
+  tipusBadge.style.background = colors[card.tipus] || "#666";
+}
+
+function loadImage(filename, onDone){
+  fallbackBox.classList.remove("show");
+  cardImage.style.display = "block";
+  const tester = new Image();
+  tester.onload = () => {
+    cardImage.src = filename + "?v=" + Date.now();
+    cardImage.alt = filename;
+    onDone(true);
+  };
+  tester.onerror = () => {
+    cardImage.removeAttribute("src");
+    cardImage.style.display = "none";
+    fallbackFile.textContent = filename;
+    fallbackBox.classList.add("show");
+    onDone(false);
+  };
+  tester.src = filename + "?v=" + Date.now();
+}
+
+function draw(){
+  if(busy) return;
+  busy = true;
+  const c = cards[getRandomCardIndex()];
+
+  flipCard.classList.remove("flipped");
+  flipCard.classList.add("shake");
+
+  setTimeout(() => {
+    flipCard.classList.remove("shake");
+    frontTitle.textContent = c.nom;
+    paintType(c);
+    loadImage(c.img, (ok) => {
+      applyCardEffects(c);
+      if(!ok){
+        statusText.textContent += " · Imatge no trobada: " + c.img;
+      }
+      try {
+        sound.currentTime = 0;
+        sound.play();
+      } catch(e) {}
+      flipCard.classList.add("flipped");
+      busy = false;
+    });
+  }, 350);
+}
+
+function showBack(){
+  if(busy) return;
+  flipCard.classList.remove("flipped");
+  statusText.textContent = "Has tornat al dors de la carta.";
+}
+
+function resetGame(){
+  stats = {or:10, poble:10, fe:10, exercit:10};
+  updateStats();
+  historyList.innerHTML = "";
+  flipCard.className = "flip-card";
+  flipCard.classList.remove("flipped");
+  cardImage.removeAttribute("src");
+  cardImage.style.display = "none";
+  fallbackBox.classList.remove("show");
+  frontTitle.textContent = "Carta";
+  tipusBadge.textContent = "tipus";
+  tipusBadge.style.background = "#666";
+  statusText.textContent = "Regne reiniciat. Esperant la primera carta...";
+  lastIndex = -1;
+}
+
+function toggleFullscreen(){
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+updateStats();
+cardImage.style.display = "none";
+</script>
+</body>
+</html>

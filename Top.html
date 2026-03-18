@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sant Marcel·lí Medieval</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0f14;
+  --bg-2:#121923;
+  --panel:#101720;
+  --panel-2:#172231;
+  --text:#f5f7fb;
+  --muted:#aab6c7;
+  --border:rgba(255,255,255,.08);
+  --gold:#f1c15c;
+  --good:#72e39c;
+  --bad:#ff7f7f;
+  --neutral:#d8e0ea;
+  --shadow:0 18px 50px rgba(0,0,0,.35);
+  --accent:#f1c15c;
+  --accent-soft:rgba(241,193,92,.18);
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:linear-gradient(180deg,var(--bg) 0%,var(--bg-2) 100%);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow:hidden;}
+button{font:inherit}
+
+body.type-economia{--accent:#f1c15c;--accent-soft:rgba(241,193,92,.18);}
+body.type-crisi{--accent:#ff7f7f;--accent-soft:rgba(255,127,127,.18);}
+body.type-guerra{--accent:#9fb5d1;--accent-soft:rgba(159,181,209,.18);}
+body.type-festa{--accent:#d99bff;--accent-soft:rgba(217,155,255,.18);}
+body.type-salut{--accent:#8ddfa7;--accent-soft:rgba(141,223,167,.18);}
+body.type-politica{--accent:#80d4ff;--accent-soft:rgba(128,212,255,.18);}
+
+.app{
+  width:100%;
+  min-height:100vh;
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+}
+
+.topbar{
+  display:grid;
+  grid-template-columns:1fr auto auto;
+  gap:16px;
+  align-items:center;
+  padding:10px 14px;
+  background:rgba(10,14,20,.82);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(12px);
+}
+
+.brand{display:flex;align-items:center;gap:12px;min-width:0;}
+.brand-mark{
+  width:14px;height:14px;border-radius:999px;
+  background:var(--accent);
+  box-shadow:0 0 20px var(--accent);
+  flex:0 0 auto;
+}
+.brand-text{min-width:0;}
+.kicker{
+  margin:0 0 2px 0;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  font-size:.68rem;
+  font-weight:800;
+}
+.main-title{
+  margin:0;
+  font-family:'Sora',sans-serif;
+  font-size:clamp(1.1rem,2vw,1.7rem);
+  line-height:1;
+  letter-spacing:-.04em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.top-stats{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.stat-chip{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  min-width:95px;
+  justify-content:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+}
+.stat-chip .icon{font-size:1rem}
+.stat-chip .label{font-size:.73rem;color:var(--muted);font-weight:800;letter-spacing:.04em;text-transform:uppercase;}
+.stat-chip .value{font-weight:900;font-size:1rem;color:var(--neutral);min-width:22px;text-align:right;transition:transform .18s ease,color .18s ease, opacity .18s ease;}
+.stat-chip .value.up{color:var(--good);transform:scale(1.14)}
+.stat-chip .value.down{color:var(--bad);transform:scale(1.14)}
+.stat-chip .value.flat{color:var(--neutral)}
+
+.controls{display:flex;align-items:center;gap:8px;}
+.icon-btn,.draw-btn{
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.05);
+  color:var(--text);
+  border-radius:14px;
+  height:42px;
+  padding:0 13px;
+  cursor:pointer;
+  transition:transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.icon-btn{width:42px;padding:0;display:grid;place-items:center;font-size:1.05rem;}
+.draw-btn{
+  background:linear-gradient(135deg,var(--accent) 0%, color-mix(in srgb, var(--accent) 70%, #ff975f 30%) 100%);
+  color:#131313;font-weight:900;letter-spacing:.02em;
+  box-shadow:var(--shadow);
+}
+.icon-btn:hover,.draw-btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.18)}
+.icon-btn:active,.draw-btn:active{transform:translateY(1px)}
+
+.main{
+  min-height:0;
+  display:grid;
+  grid-template-columns:1.7fr .75fr;
+}
+
+.visual{
+  position:relative;
+  overflow:hidden;
+  background:#080c12;
+}
+.visual img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transform:scale(1.01);
+  transition:transform .55s ease, filter .35s ease, opacity .35s ease;
+}
+.visual::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.08) 0%, rgba(0,0,0,.03) 45%, rgba(0,0,0,.38) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.02) 0%, rgba(0,0,0,.08) 100%);
+}
+.visual.reveal img{animation:reveal .55s ease;}
+@keyframes reveal{
+  0%{transform:scale(1.06);filter:blur(8px) brightness(.7);opacity:.35}
+  55%{transform:scale(1.02);filter:blur(2px) brightness(.95);opacity:.9}
+  100%{transform:scale(1.01);filter:blur(0) brightness(1);opacity:1}
+}
+
+.panel{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  min-width:0;
+  background:
+    radial-gradient(circle at top right,var(--accent-soft),transparent 28%),
+    linear-gradient(180deg,#15202d 0%, #0f1721 100%);
+  border-left:1px solid var(--border);
+  padding:18px 18px 14px;
+  gap:16px;
+}
+
+.panel-top{display:flex;flex-direction:column;gap:12px;}
+.type-badge{
+  display:inline-flex;width:max-content;
+  padding:7px 10px;border-radius:999px;
+  border:1px solid color-mix(in srgb, var(--accent) 40%, transparent 60%);
+  background:color-mix(in srgb, var(--accent) 12%, transparent 88%);
+  color:var(--accent);
+  text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;font-weight:900;
+}
+.card-title{
+  margin:0;
+  font-family:'Sora',sans-serif;
+  font-size:clamp(2rem,4vw,3.8rem);
+  line-height:.93;
+  letter-spacing:-.05em;
+  text-wrap:balance;
+}
+.effect{
+  font-size:clamp(1.02rem,1.55vw,1.28rem);
+  line-height:1.42;
+  font-weight:700;
+  color:var(--text);
+}
+.flavour{
+  margin:0;
+  font-size:.98rem;
+  line-height:1.5;
+  color:var(--muted);
+  font-style:italic;
+}
+.mini-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.mini-card{
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.04);
+  border-radius:18px;
+  padding:12px 12px 10px;
+}
+.mini-card .mini-name{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800;margin-bottom:7px;}
+.mini-card .mini-val{font-size:1.35rem;font-weight:900;color:var(--text)}
+
+.history-bar{
+  display:flex;
+  gap:10px;
+  padding:10px 12px 12px;
+  overflow-x:auto;
+  background:rgba(7,10,15,.7);
+  border-top:1px solid var(--border);
+}
+.history-bar::-webkit-scrollbar{height:8px}
+.history-bar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:999px}
+.history-item{
+  position:relative;
+  min-width:110px;
+  width:110px;
+  height:68px;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:#0d131b;
+  flex:0 0 auto;
+}
+.history-item img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95)}
+.history-item span{
+  position:absolute;left:0;right:0;bottom:0;
+  padding:6px 7px;
+  font-size:.7rem;font-weight:800;
+  background:linear-gradient(180deg,transparent 0%, rgba(0,0,0,.72) 100%);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+.floating-draw{display:none}
+
+@media (max-width: 980px){
+  html,body{overflow:auto}
+  .app{grid-template-rows:auto auto auto}
+  .topbar{grid-template-columns:1fr;gap:10px;padding:10px}
+  .top-stats{justify-content:flex-start}
+  .controls{justify-content:flex-end}
+  .main{grid-template-columns:1fr}
+  .visual{min-height:47vh}
+  .panel{border-left:none;border-top:1px solid var(--border)}
+  .history-bar{padding-bottom:10px}
+}
+
+@media (max-width: 560px){
+  .stat-chip{min-width:calc(50% - 4px);justify-content:flex-start}
+  .controls{gap:6px}
+  .icon-btn,.draw-btn{height:40px}
+  .card-title{font-size:2rem}
+  .effect{font-size:1rem}
+}
+</style>
+</head>
+<body class="type-economia">
+<div class="app" id="appRoot">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <p class="kicker">Carta interactiva</p>
+        <h1 class="main-title">Sant Marcel·lí Medieval</h1>
+      </div>
+    </div>
+
+    <div class="top-stats">
+      <div class="stat-chip"><span class="icon">🍞</span><span class="label">Menjar</span><span class="value flat" id="food">+3</span></div>
+      <div class="stat-chip"><span class="icon">⚔️</span><span class="label">Força</span><span class="value flat" id="strength">+0</span></div>
+      <div class="stat-chip"><span class="icon">💰</span><span class="label">Diners</span><span class="value flat" id="money">+2</span></div>
+      <div class="stat-chip"><span class="icon">😊</span><span class="label">Felicitat</span><span class="value flat" id="happiness">+2</span></div>
+    </div>
+
+    <div class="controls">
+      <button class="icon-btn" id="historyBtn" title="Anar a historial">🕘</button>
+      <button class="icon-btn" id="resetBtn" title="Reiniciar">↺</button>
+      <button class="icon-btn" id="fullscreenBtn" title="Pantalla completa">⛶</button>
+      <button class="draw-btn" id="drawBtn">🎴 Llançar</button>
+    </div>
+  </header>
+
+  <main class="main" id="cardStage">
+    <section class="visual" id="visualBox">
+      <img id="cardImage" src="Collita.jpeg" alt="Carta Sant Marcel·lí Medieval">
+    </section>
+
+    <aside class="panel">
+      <div class="panel-top">
+        <div class="type-badge" id="typeBadge">Economia</div>
+        <h2 class="card-title" id="cardTitle">Sant Marcel·lí Medieval</h2>
+        <div class="effect" id="cardEffect">Una bona collita ompli el barri de productes, intercanvis i esperança per als pròxims dies.</div>
+        <p class="flavour" id="cardFlavour">“La terra recompensa el treball compartit.”</p>
+      </div>
+
+      <div class="mini-grid">
+        <div class="mini-card">
+          <div class="mini-name">Tipus</div>
+          <div class="mini-val" id="miniType">Economia</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-name">Carta</div>
+          <div class="mini-val" id="miniIndex">1 / 8</div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <div class="history-bar" id="historyBar"></div>
+</div>
+
+<audio id="flipSound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-fast-paper-flip-1530.mp3"></audio>
+
+<script>
+const cards = [
+  {
+    title: "Sant Marcel·lí Medieval",
+    type: "Economia",
+    themeClass: "type-economia",
+    effect: "Una bona collita ompli el barri de productes, intercanvis i esperança per als pròxims dies.",
+    flavour: "La terra recompensa el treball compartit.",
+    image: "Collita.jpeg",
+    stats: { food: "+3", strength: "+0", money: "+2", happiness: "+2" }
+  },
+  {
+    title: "Sant Marcel·lí Medieval",
+    type: "Política",
+    themeClass: "type-politica",
+    effect: "Arriben nous impostos i moltes famílies han de retallar despeses per a poder resistir.",
+    flavour: "Quan puja el tribut, baixa l'alegria.",
+    image: "Impostos.jpeg",
+    stats: { food: "-1", strength: "+0", money: "-3", happiness: "-2" }
+  },
+  {
+    title: "Sant Marcel·lí Medieval",
+    type: "Festa",
+    themeClass: "type-festa",
+    effect: "Una gran festa ompli la plaça de música, taules parades i rialles per tot el veïnat.",
+    flavour: "Quan el poble celebra, fins les pedres somriuen.",
+    image: "Festa.jpeg",
+    stats: { food: "-1", strength: "+0", money: "-1", happiness: "+4" }
+  },
+  {
+    title: "Sant Marcel·lí Medieval",
+    type: "Guerra",
+    themeClass: "type-guerra",
+    effect: "Els guardians preparen la defensa del poble i reforcen la vigilància als punts més febles.",
+    flavour: "La calma també necessita espases.",
+    image: "Guerra.jpeg",
+    stats: { food: "-1", strength: "+3", money: "-2", happiness: "+0" }
+  },
+  {
+    title: "Sant Marcel·lí Medieval",
+    type: "Crisi",
+    themeClass: "type-crisi",
+    effect: "Una traïció dins del consell complica el comerç, debilita l'ordre i enfonsa la moral.",
+    flavour: "No totes les dagues es veuen abans de colpejar.",
+    image: "Traicio.jpeg",
+    stats: { food: "-1", strength: "-1", money: "-2", happiness: "-3" }
+  },
+  {
+    title: "Sant Marcel·lí Medieval",
+    type: "Política",
+    themeClass: "type-politica",
+    effect: "Un decret inesperat reorganitza el mercat i obliga el poble a adaptar-se ràpidament.",
+    flavour: "La llei canvia abans que les persones la comprenguen.",
+    image: "Decret.jpeg",
+    stats: { food: "+0", strength: "+1", money: "-1", happiness: "-1" }
+  },
+  {
+    title: "Sant Marcel·lí Medieval",
+    type: "Crisi",
+    themeClass: "type-crisi",
+    effect: "Una rebel·lió esclata als carrers i tot el barri entra en dies d'incertesa i tensió.",
+    flavour: "Quan la ràbia parla, el ferro escolta.",
+    image: "Rebelio.jpeg",
+    stats: { food: "-2", strength: "-2", money: "-2", happiness: "-4" }
+  },
+  {
+    title: "Sant Marcel·lí Medieval",
+    type: "Salut",
+    themeClass: "type-salut",
+    effect: "La malaltia s'estén i obliga a gastar recursos mentre el veïnat perd energia i confiança.",
+    flavour: "A voltes l'enemic no porta armadura.",
+    image: "Malaltia.jpeg",
+    stats: { food: "-2", strength: "-1", money: "-1", happiness: "-3" }
+  }
+];
+
+const fallbackSvg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="%2318212d"/><stop offset="1" stop-color="%230c1016"/></linearGradient></defs><rect width="1200" height="900" fill="url(%23g)"/><text x="600" y="430" text-anchor="middle" fill="%23f1c15c" font-size="60" font-family="Arial" font-weight="700">No s\'ha trobat la imatge</text><text x="600" y="500" text-anchor="middle" fill="%23d7dde7" font-size="30" font-family="Arial">Revisa que el nom coincidisca exactament amb GitHub</text></svg>';
+
+const els = {
+  body: document.body,
+  visual: document.getElementById('visualBox'),
+  image: document.getElementById('cardImage'),
+  title: document.getElementById('cardTitle'),
+  effect: document.getElementById('cardEffect'),
+  flavour: document.getElementById('cardFlavour'),
+  typeBadge: document.getElementById('typeBadge'),
+  miniType: document.getElementById('miniType'),
+  miniIndex: document.getElementById('miniIndex'),
+  food: document.getElementById('food'),
+  strength: document.getElementById('strength'),
+  money: document.getElementById('money'),
+  happiness: document.getElementById('happiness'),
+  historyBar: document.getElementById('historyBar'),
+  sound: document.getElementById('flipSound'),
+  drawBtn: document.getElementById('drawBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  fullscreenBtn: document.getElementById('fullscreenBtn'),
+  historyBtn: document.getElementById('historyBtn')
+};
+
+let currentDeck = [];
+let currentCard = null;
+let history = [];
+let round = 0;
+
+function shuffle(arr){
+  const copy = [...arr];
+  for(let i=copy.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [copy[i],copy[j]] = [copy[j],copy[i]];
+  }
+  return copy;
+}
+
+function refillDeck(){
+  currentDeck = shuffle(cards);
+}
+
+function nextCard(){
+  if(currentDeck.length===0) refillDeck();
+  const next = currentDeck.pop();
+  if(currentCard && cards.length > 1 && next.image === currentCard.image){
+    currentDeck.unshift(next);
+    return nextCard();
+  }
+  return next;
+}
+
+function setImage(filename, altText){
+  els.image.onerror = () => { els.image.src = fallbackSvg; };
+  els.image.src = filename;
+  els.image.alt = altText;
+}
+
+function setStat(el, value){
+  el.textContent = value;
+  el.classList.remove('up','down','flat');
+  if(value.trim().startsWith('+') && value.trim() !== '+0') el.classList.add('up');
+  else if(value.trim().startsWith('-')) el.classList.add('down');
+  else el.classList.add('flat');
+  setTimeout(()=>{ el.classList.remove('up','down'); if(!el.classList.contains('flat')) el.classList.add('flat'); }, 450);
+}
+
+function renderHistory(){
+  els.historyBar.innerHTML = '';
+  history.slice(0,4).forEach((item)=>{
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.innerHTML = `<img src="${item.image}" alt="${item.type}"><span>${item.type}</span>`;
+    const img = div.querySelector('img');
+    img.onerror = () => { img.src = fallbackSvg; };
+    els.historyBar.appendChild(div);
+  });
+}
+
+function applyCard(card){
+  currentCard = card;
+  round += 1;
+  els.body.className = card.themeClass;
+  els.title.textContent = card.title;
+  els.effect.textContent = card.effect;
+  els.flavour.textContent = `“${card.flavour}”`;
+  els.typeBadge.textContent = card.type;
+  els.miniType.textContent = card.type;
+  els.miniIndex.textContent = `${round} / ${cards.length}`;
+
+  setStat(els.food, card.stats.food);
+  setStat(els.strength, card.stats.strength);
+  setStat(els.money, card.stats.money);
+  setStat(els.happiness, card.stats.happiness);
+
+  els.visual.classList.remove('reveal');
+  void els.visual.offsetWidth;
+  els.visual.classList.add('reveal');
+  setImage(card.image, card.effect);
+
+  history.unshift(card);
+  history = history.slice(0,8);
+  renderHistory();
+
+  els.sound.currentTime = 0;
+  els.sound.play().catch(()=>{});
+}
+
+function draw(){
+  applyCard(nextCard());
+}
+
+function resetGame(){
+  round = 0;
+  history = [];
+  refillDeck();
+  applyCard(currentDeck.pop());
+}
+
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen?.();
+  }else{
+    document.exitFullscreen?.();
+  }
+}
+
+els.drawBtn.addEventListener('click', draw);
+els.resetBtn.addEventListener('click', resetGame);
+els.fullscreenBtn.addEventListener('click', toggleFullscreen);
+els.historyBtn.addEventListener('click', ()=> els.historyBar.scrollIntoView({behavior:'smooth', block:'nearest', inline:'nearest'}));
+
+document.addEventListener('fullscreenchange', ()=>{
+  els.fullscreenBtn.textContent = document.fullscreenElement ? '✕' : '⛶';
+  els.fullscreenBtn.title = document.fullscreenElement ? 'Eixir de pantalla completa' : 'Pantalla completa';
+});
+
+document.addEventListener('keydown', (e)=>{
+  if(e.code === 'Space'){ e.preventDefault(); draw(); }
+  if(e.key.toLowerCase() === 'f') toggleFullscreen();
+  if(e.key.toLowerCase() === 'r') resetGame();
+});
+
+refillDeck();
+applyCard(currentDeck.pop());
+</script>
+</body>
+</html>

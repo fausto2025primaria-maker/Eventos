@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sant Marcel·lí Medieval — V2</title>
+<style>
+:root{
+  --bg:#0a0d12;
+  --panel:#111723;
+  --panel-2:#182131;
+  --text:#f5f7fb;
+  --muted:#b5bfce;
+  --gold:#f0c46a;
+  --edge:rgba(255,255,255,.08);
+  --shadow:0 24px 70px rgba(0,0,0,.45);
+  --accent:#7aa8ff;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:radial-gradient(circle at top, #172032 0%, var(--bg) 55%);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;}
+body{height:100vh;}
+.app{width:100%;height:100vh;display:grid;grid-template-rows:auto 1fr auto;}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:10px 16px;border-bottom:1px solid var(--edge);
+  background:rgba(9,12,18,.95);
+}
+.brand{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.kicker{font-size:.72rem;text-transform:uppercase;letter-spacing:.18em;color:#8db8ff;font-weight:800;}
+.title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.35rem,2.1vw,2.2rem);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.btn{
+  width:42px;height:42px;border-radius:14px;border:1px solid var(--edge);
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  color:var(--text);display:grid;place-items:center;cursor:pointer;
+  transition:transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+  box-shadow:none;
+}
+.btn:hover{border-color:rgba(240,196,106,.35);}
+.btn:active{transform:translateY(1px);}
+.btn.primary{width:auto;padding:0 16px;display:flex;gap:10px;font-weight:800;background:linear-gradient(135deg,#f0c46a,#ff9966);color:#1a1410;border:none;}
+.btn svg{width:18px;height:18px;fill:currentColor;}
+.board{
+  width:100%;height:100%;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,.85fr);
+  overflow:hidden;
+}
+.visual{
+  position:relative;min-height:0;background:#090d14;overflow:hidden;
+}
+.visual::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(circle at top left, rgba(240,196,106,.14), transparent 24%),
+    linear-gradient(90deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,.08) 50%, rgba(0,0,0,.38) 100%);
+  z-index:2;
+}
+
+.card-image{
+  width:100%;height:100%;display:block;object-fit:cover;transform:scale(1.01);
+  transition:opacity .2s ease;
+}
+.visual.revealing .card-image{opacity:.82;}
+.corner-badge{
+  position:absolute;left:28px;top:24px;z-index:4;
+  background:rgba(11,15,22,.74);border:1px solid rgba(240,196,106,.25);border-radius:999px;
+  padding:8px 12px;font-size:.78rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);
+
+}
+.stats-bar{
+  position:absolute;left:24px;right:24px;top:24px;z-index:4;
+  display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:0 82px 0 160px;
+}
+.stat-pill{
+  min-width:92px;padding:9px 12px;border-radius:999px;
+  background:rgba(11,15,22,.68);border:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.stat-pill .icon{font-size:1rem;}
+.stat-pill .label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800;}
+.stat-pill .value{font-size:1rem;font-weight:900;}
+.value.pos{color:#82e4a3;}
+.value.neg{color:#ff8484;}
+.value.neu{color:#dce3ef;}
+.panel{
+  min-height:0;display:flex;flex-direction:column;justify-content:space-between;gap:18px;
+  padding:22px 20px 18px;background:
+    radial-gradient(circle at top right, rgba(122,168,255,.18), transparent 26%),
+    linear-gradient(180deg, var(--panel-2) 0%, var(--panel) 100%);
+  border-left:1px solid var(--edge);
+}
+.type-chip{
+  display:inline-flex;align-self:flex-start;padding:8px 12px;border-radius:999px;
+  font-size:.74rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:var(--gold);
+}
+.card-title{
+  margin:0;font-family:Georgia,'Times New Roman',serif;font-size:clamp(2rem,3.5vw,3.8rem);line-height:.92;letter-spacing:-.03em;
+  text-shadow:0 0 22px rgba(240,196,106,.14);
+}
+.effect{font-size:clamp(1rem,1.35vw,1.2rem);line-height:1.45;font-weight:700;color:var(--text);}
+.flavour{
+  margin:0;font-size:1rem;line-height:1.55;color:var(--muted);font-style:italic;
+  padding-left:14px;border-left:3px solid rgba(240,196,106,.3);
+}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.meta-card{
+  padding:12px 13px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+}
+.meta-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800;margin-bottom:6px;}
+.meta-value{font-size:.95rem;font-weight:800;color:var(--text);}
+.toast{
+  position:absolute;left:24px;bottom:22px;z-index:5;
+  background:rgba(11,15,22,.82);border:1px solid rgba(240,196,106,.25);border-radius:14px;padding:10px 14px;
+  font-size:.86rem;font-weight:700;color:#eef2f8;opacity:0;transform:translateY(10px);transition:all .25s ease;
+}
+.toast.show{opacity:1;transform:translateY(0);}
+.hidden{display:none !important;}
+@media (max-width: 980px){
+  .board{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;}
+  .panel{border-left:none;border-top:1px solid var(--edge);padding:18px 16px 16px;}
+  .stats-bar{left:14px;right:14px;top:14px;padding:0 52px 0 136px;gap:8px;}
+  .stat-pill{min-width:80px;padding:8px 10px;}
+  .corner-badge{left:16px;top:16px;padding:7px 10px;font-size:.72rem;}
+  .visual::after{inset:12px;border-radius:20px;}
+}
+@media (max-width: 640px){
+  html,body,.app{overflow:auto;height:auto;min-height:100vh;}
+  .topbar{padding:10px 10px;}
+  .kicker{display:none;}
+  .title{font-size:1.1rem;white-space:normal;}
+  .controls{gap:6px;}
+  .btn{width:38px;height:38px;border-radius:12px;}
+  .btn.primary{padding:0 12px;}
+  .board{grid-template-columns:1fr;grid-template-rows:auto auto;}
+  .visual{height:48vh;min-height:320px;}
+  .stats-bar{position:absolute;left:10px;right:10px;top:10px;padding:0 40px 0 120px;gap:6px;justify-content:flex-start;}
+  .stat-pill{min-width:unset;padding:7px 10px;}
+  .stat-pill .label{display:none;}
+  .type-chip{font-size:.68rem;}
+  .card-title{font-size:1.9rem;}
+  .meta{grid-template-columns:1fr;}
+}
+.fullscreen-mode .topbar{padding:8px 12px;}
+</style>
+</head>
+<body>
+<div class="app" id="appRoot">
+  <div class="topbar">
+    <div class="brand">
+      <div class="kicker">Carta interactiva</div>
+      <div class="title">Sant Marcel·lí Medieval</div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Pantalla completa" aria-label="Pantalla completa">
+        <svg viewBox="0 0 24 24"><path d="M7 3H3v4h2V5h2V3zm14 0h-4v2h2v2h2V3zM5 17H3v4h4v-2H5v-2zm16 0h-2v2h-2v2h4v-4z"/></svg>
+      </button>
+      <button class="btn" onclick="resetDeck()" title="Reiniciar" aria-label="Reiniciar">
+        <svg viewBox="0 0 24 24"><path d="M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5a5 5 0 1 1-8.66-3.54l-1.42-1.42A7 7 0 1 0 19 13c0-3.87-3.13-7-7-7z"/></svg>
+      </button>
+      <button class="btn primary" onclick="drawCard()" title="Llançar carta" aria-label="Llançar carta">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm3 3v10h10V7H7zm2 2h6v6H9V9z"/></svg>
+        <span>Llançar</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="board" id="board">
+    <div class="visual" id="visual">
+      <div class="corner-badge" id="cornerBadge">Economia</div>
+      <div class="stats-bar">
+        <div class="stat-pill"><span class="icon">🍞</span><span class="label">Menjar</span><span class="value pos" id="food">+3</span></div>
+        <div class="stat-pill"><span class="icon">⚔️</span><span class="label">Força</span><span class="value neu" id="strength">+0</span></div>
+        <div class="stat-pill"><span class="icon">💰</span><span class="label">Diners</span><span class="value pos" id="money">+2</span></div>
+        <div class="stat-pill"><span class="icon">😊</span><span class="label">Felicitat</span><span class="value pos" id="happiness">+2</span></div>
+      </div>
+      <img class="card-image" id="cardImage" src="Collita.jpeg" alt="Carta Sant Marcel·lí Medieval">
+      <div class="toast" id="toast">Carta llançada</div>
+    </div>
+
+    <aside class="panel" id="panel">
+      <div>
+        <div class="type-chip" id="typeChip">Economia</div>
+        <h1 class="card-title" id="cardTitle">Sant Marcel·lí Medieval</h1>
+        <p class="effect" id="effect">Després de setmanes de faena constant, l'oratge acompanya i els camps responen amb abundància. Els sacs de gra arriben plens, les hortes donen més del que s'esperava i els corrals també aporten recursos. Al mercat es nota de seguida: hi ha més moviment, més intercanvis, més confiança entre famílies i una sensació general que, almenys per un temps, el poble podrà respirar amb certa tranquil·litat. Una bona collita no sols porta menjar, també reforça l'economia local i fa créixer l'esperança col·lectiva.</p>
+        <p class="flavour" id="flavour">“La terra recompensa el treball compartit, però només a qui ha sabut esperar, sembrar i resistir sense perdre la fe.”</p>
+      </div>
+
+      <div class="meta">
+        <div class="meta-card">
+          <div class="meta-label">Carta</div>
+          <div class="meta-value" id="cardName">Collita</div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">Deck</div>
+          <div class="meta-value" id="deckCounter">1 / 8</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  </div>
+
+
+<script>
+const fallbackSvg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="%23131b27"/><stop offset="1" stop-color="%23090d14"/></linearGradient></defs><rect width="1200" height="800" fill="url(%23g)"/><text x="600" y="380" text-anchor="middle" fill="%23f0c46a" font-size="62" font-family="Arial" font-weight="700">No s\'ha trobat la imatge</text><text x="600" y="452" text-anchor="middle" fill="%23d9e0eb" font-size="30" font-family="Arial">Comprova que el nom coincidisca exactament amb el repositori</text></svg>';
+
+const cards = [
+  {
+    key:'Collita', type:'Economia', theme:'economia', image:'Collita.jpeg',
+    effect:'Després de setmanes de faena constant, l'oratge acompanya i els camps responen amb abundància. Els sacs de gra arriben plens, les hortes donen més del que s'esperava i els corrals també aporten recursos. Al mercat es nota de seguida: hi ha més moviment, més intercanvis, més confiança entre famílies i una sensació general que, almenys per un temps, el poble podrà respirar amb certa tranquil·litat. Una bona collita no sols porta menjar, també reforça l'economia local i fa créixer l'esperança col·lectiva.',
+    flavour:'La terra recompensa el treball compartit, però només a qui ha sabut esperar, sembrar i resistir sense perdre la fe.',
+    stats:{food:'+3', strength:'+0', money:'+2', happiness:'+2'}
+  },
+  {
+    key:'Impostos', type:'Crisi', theme:'crisi', image:'Impostos.jpeg',
+    effect:'El senyor imposa nous tributs i la pressió es nota immediatament a les cases, als tallers i a les parades del mercat. El que abans servia per a guardar una mica de blat, reparar eines o comprar roba ara s'ha d'entregar en forma d'impost. Les famílies comencen a estalviar en tot, es frenen els intercanvis i apareix una sensació d'ofec que afecta tant els més humils com aquells que vivien amb una certa comoditat. Quan els impostos pugen massa, la vida quotidiana es torna més estreta i el desànim s'escampa.',
+    flavour:'Quan puja el tribut, baixa l'alegria, i fins el pa sembla més menut damunt la taula.',
+    stats:{food:'-1', strength:'+0', money:'-3', happiness:'-2'}
+  },
+  {
+    key:'Festa', type:'Celebració', theme:'festa', image:'Festa.jpeg',
+    effect:'La plaça major es transforma en un espai de trobada, música i celebració. Les famílies ixen de casa, es pengen teles i ornaments, es preparen taules compartides i durant unes hores el pes dels problemes sembla més lleuger. La festa reactiva els vincles del veïnat, fa circular històries, cançons i jocs, i recorda a tothom que una comunitat també es defensa mantenint viva l'alegria. Encara que es gasten alguns recursos, el guany emocional i social és enorme.',
+    flavour:'Quan el poble celebra, fins les pedres somriuen i les preocupacions callen una estona.',
+    stats:{food:'-1', strength:'+0', money:'-1', happiness:'+4'}
+  },
+  {
+    key:'Guerra', type:'Guerra', theme:'guerra', image:'Guerra.jpeg',
+    effect:'Davant la possibilitat d'un atac, els guardians revisen armes, reforcen portes, distribueixen torns de vigilància i preparen la resposta defensiva. Es dedica menys temps a altres tasques, però augmenta la capacitat de resistència del poble. La presència de soldats als accessos, l'ordre en les rondes i la disciplina als murs transmeten seguretat a uns i inquietud a altres. Preparar-se per a la guerra sempre té un cost, però ignorar el perill podria resultar molt pitjor.',
+    flavour:'La calma també necessita espases, perquè la pau sense defensa només dura fins que arriba el primer enemic.',
+    stats:{food:'-1', strength:'+3', money:'-2', happiness:'+0'}
+  },
+  {
+    key:'Traïció', type:'Crisi', theme:'crisi', image:'Traicio.jpeg',
+    effect:'Una decisió presa en secret, una informació venuda a l'enemic o una deslleialtat dins del mateix govern del barri provoca una crisi profunda. El comerç es desorganitza, la confiança entre dirigents desapareix i el veïnat comença a sospitar de tothom. Quan hi ha traïció, el colp no és només material: també trenca els llaços invisibles que mantenen unit un poble. Reconstruir eixa confiança sol ser més difícil que reparar una muralla.',
+    flavour:'No totes les dagues es veuen abans de colpejar; algunes arriben embolicades en promeses i somriures.',
+    stats:{food:'-1', strength:'-1', money:'-2', happiness:'-3'}
+  },
+  {
+    key:'Decret', type:'Govern', theme:'govern', image:'Decret.jpeg',
+    effect:'Les autoritats anuncien una nova norma que afecta el funcionament del mercat, la distribució dels productes o l'ordre del barri. Alguns pensen que pot aportar una mica més d'estabilitat o control, però la majoria necessita temps per entendre què canvia exactament i com s'hauran d'adaptar. Hi ha qui ix beneficiat i qui es veu perjudicat, i durant els primers dies domina la confusió. Un decret pot millorar l'organització, però també generar malestar si arriba sense avís o sense consens.',
+    flavour:'La llei canvia abans que les persones la comprenguen, i mentrestant el poble ha d'aprendre a sobreviure entre normes noves.',
+    stats:{food:'+0', strength:'+1', money:'-1', happiness:'-1'}
+  },
+  {
+    key:'Rebel·lió', type:'Crisi', theme:'crisi', image:'Rebelio.jpeg',
+    effect:'L'enuig acumulat esclata finalment als carrers. Grups armats, protestes i enfrontaments improvisats alteren completament la vida del barri. Les rutes comercials queden interrompudes, la defensa es descoordina i moltes famílies es tanquen a casa per por del que puga passar. Una rebel·lió pot nàixer d'una injustícia real, però mentre dura deixa darrere seu desgast, desordre i una ferida profunda en la convivència. Ningú sap com acabarà, però tothom nota les conseqüències des del primer moment.',
+    flavour:'Quan la ràbia parla, el ferro escolta, i els carrers aprenen massa de pressa el llenguatge de la por.',
+    stats:{food:'-2', strength:'-2', money:'-2', happiness:'-4'}
+  },
+  {
+    key:'Malaltia', type:'Malaltia', theme:'malaltia', image:'Malaltia.jpeg',
+    effect:'Una malaltia comença a córrer de casa en casa i transforma la rutina del poble en una lluita lenta contra el cansament, la por i la falta de recursos. Cal atendre els malalts, dedicar espais al repòs, gastar provisions i reorganitzar les tasques habituals perquè no tot s'ature. El treball baixa, la força col·lectiva es ressent i també disminueix l'ànim general, perquè ningú sap quant de temps durarà la situació. Quan la malaltia arriba, no sols afecta els cossos: també posa a prova la solidaritat i la resistència del veïnat.',
+    flavour:'A voltes l'enemic no porta armadura ni estendard; entra en silenci i obliga el poble a lluitar d'una altra manera.',
+    stats:{food:'-2', strength:'-1', money:'-1', happiness:'-3'}
+  }
+];
+
+const themeStyles = {
+  economia: { chip:'#f0c46a', glow:'rgba(240,196,106,.18)', panel:'radial-gradient(circle at top right, rgba(240,196,106,.20), transparent 26%), linear-gradient(180deg, #182131 0%, #111723 100%)', badge:'Economia' },
+  crisi: { chip:'#ff8f8f', glow:'rgba(255,143,143,.18)', panel:'radial-gradient(circle at top right, rgba(255,108,108,.18), transparent 28%), linear-gradient(180deg, #251822 0%, #17121a 100%)', badge:'Crisi' },
+  festa: { chip:'#d4a6ff', glow:'rgba(212,166,255,.18)', panel:'radial-gradient(circle at top right, rgba(212,166,255,.18), transparent 28%), linear-gradient(180deg, #21172d 0%, #14111d 100%)', badge:'Celebració' },
+  guerra: { chip:'#b8c7d9', glow:'rgba(184,199,217,.18)', panel:'radial-gradient(circle at top right, rgba(184,199,217,.14), transparent 28%), linear-gradient(180deg, #1b2028 0%, #11151b 100%)', badge:'Guerra' },
+  govern: { chip:'#8db8ff', glow:'rgba(141,184,255,.18)', panel:'radial-gradient(circle at top right, rgba(141,184,255,.18), transparent 28%), linear-gradient(180deg, #162235 0%, #101724 100%)', badge:'Govern' },
+  malaltia: { chip:'#9ed98a', glow:'rgba(158,217,138,.16)', panel:'radial-gradient(circle at top right, rgba(158,217,138,.14), transparent 28%), linear-gradient(180deg, #19261a 0%, #121915 100%)', badge:'Malaltia' }
+};
+
+let deck = [];
+let currentIndex = 0;
+
+function shuffle(list){
+  const arr = [...list];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function refillDeck(){
+  deck = shuffle(cards);
+  currentIndex = 0;
+}
+
+function statClass(value){
+  if(String(value).startsWith('+0') || String(value) === '0') return 'neu';
+  if(String(value).startsWith('+')) return 'pos';
+  if(String(value).startsWith('-')) return 'neg';
+  return 'neu';
+}
+
+function setImage(filename, altText){
+  const image = document.getElementById('cardImage');
+  image.onerror = null;
+  image.onload = null;
+  image.onerror = () => { if(image.src !== fallbackSvg) image.src = fallbackSvg; };
+  image.src = filename;
+  image.alt = altText;
+}
+
+function applyTheme(themeKey){
+  const theme = themeStyles[themeKey] || themeStyles.economia;
+  const panel = document.getElementById('panel');
+  const chip = document.getElementById('typeChip');
+  const badge = document.getElementById('cornerBadge');
+  const title = document.getElementById('cardTitle');
+  panel.style.background = theme.panel;
+  chip.style.color = theme.chip;
+  chip.style.borderColor = theme.glow;
+  chip.style.boxShadow = `0 0 0 1px ${theme.glow} inset`;
+  badge.textContent = theme.badge;
+  badge.style.color = theme.chip;
+  badge.style.borderColor = theme.glow;
+  title.style.textShadow = `0 0 24px ${theme.glow}`;
+}
+
+function updateStats(stats){
+  const fields = [
+    ['food', stats.food],
+    ['strength', stats.strength],
+    ['money', stats.money],
+    ['happiness', stats.happiness]
+  ];
+  fields.forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    el.textContent = value;
+    el.className = `value ${statClass(value)}`;
+  });
+}
+
+let toastTimer;
+function showToast(text){
+  const toast = document.getElementById('toast');
+  toast.textContent = text;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 1100);
+}
+
+function playSound(){}
+
+function revealCard(card, initial = false){
+  const visual = document.getElementById('visual');
+  if(!initial){
+    visual.classList.add('revealing');
+    playSound();
+  }
+
+  const delay = initial ? 0 : 80;
+  setTimeout(() => {
+    document.getElementById('cardTitle').textContent = 'Sant Marcel·lí Medieval';
+    document.getElementById('effect').textContent = card.effect;
+    document.getElementById('flavour').textContent = `“${card.flavour}”`;
+    document.getElementById('cardName').textContent = card.key;
+    document.getElementById('deckCounter').textContent = `${Math.min(currentIndex, cards.length)} / ${cards.length}`;
+    document.getElementById('typeChip').textContent = card.type;
+    applyTheme(card.theme);
+    updateStats(card.stats);
+    setImage(card.image, card.key);
+
+    if(!initial){
+      visual.classList.remove('revealing');
+      showToast(card.key);
+    }
+  }, delay);
+}
+
+function drawCard(){
+  if(deck.length === 0){
+    refillDeck();
+    showToast('Nou deck');
+  }
+  const card = deck.shift();
+  currentIndex = cards.length - deck.length;
+  revealCard(card);
+}
+
+function resetDeck(){
+  refillDeck();
+  currentIndex = 1;
+  revealCard(deck.shift(), true);
+  document.getElementById('deckCounter').textContent = `1 / ${cards.length}`;
+  showToast('Partida reiniciada');
+}
+
+async function toggleFullscreen(){
+  const app = document.documentElement;
+  try{
+    if(!document.fullscreenElement){
+      await app.requestFullscreen();
+      document.body.classList.add('fullscreen-mode');
+    }else{
+      await document.exitFullscreen();
+      document.body.classList.remove('fullscreen-mode');
+    }
+  }catch(e){}
+}
+
+document.addEventListener('fullscreenchange', () => {
+  document.body.classList.toggle('fullscreen-mode', !!document.fullscreenElement);
+});
+
+document.addEventListener('keydown', (e) => {
+  const tag = document.activeElement?.tagName;
+  if(tag === 'INPUT' || tag === 'TEXTAREA') return;
+  if(e.code === 'Space'){
+    e.preventDefault();
+    drawCard();
+  }
+  if(e.key.toLowerCase() === 'f'){
+    e.preventDefault();
+    toggleFullscreen();
+  }
+  if(e.key.toLowerCase() === 'r'){
+    e.preventDefault();
+    resetDeck();
+  }
+});
+
+resetDeck();
+</script>
+</body>
+</html>

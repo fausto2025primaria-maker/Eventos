@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Llançador Medieval PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+  margin:0;
+  background:#1a120c;
+  font-family:Georgia,serif;
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+h1{
+  margin:20px;
+  font-size:3rem;
+}
+#card{
+  width:80%;
+  max-width:900px;
+  background:#f4e7c2;
+  color:#2b1b12;
+  border-radius:20px;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 20px 40px rgba(0,0,0,0.4);
+  transform-style:preserve-3d;
+  transition:transform 0.6s;
+}
+.flip{
+  transform:rotateY(180deg);
+}
+#cardImage{
+  width:100%;
+  max-height:400px;
+  object-fit:cover;
+  border-radius:12px;
+  margin-bottom:15px;
+  display:none;
+}
+.title{
+  font-size:2.5rem;
+  margin-bottom:10px;
+}
+.effect{
+  font-size:1.4rem;
+  margin:15px 0;
+}
+.flavour{
+  font-style:italic;
+  font-size:1.2rem;
+}
+button{
+  margin:20px;
+  padding:15px 25px;
+  font-size:1.2rem;
+  border:none;
+  border-radius:10px;
+  background:#8e241b;
+  color:white;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<h1>🎴 Llançador Medieval PRO</h1>
+
+<div id="card">
+  <img id="cardImage" src="" alt="Carta">
+  <div class="title">Preparat...</div>
+  <div class="effect">Prem per començar</div>
+  <div class="flavour"></div>
+</div>
+
+<button onclick="draw()">Llançar carta</button>
+
+<audio id="sound" src="https://assets.mixkit.co/sfx/preview/mixkit-fast-paper-flip-1530.mp3"></audio>
+
+<script>
+const cards = [
+{title:"Hivern dur",effect:"Tots perden 2 de menjar",flavour:"El fred no perdona",img:"Hivern.png"},
+{title:"Malaltia",effect:"Alguns perden recursos",flavour:"Arriba sense avisar",img:"Malaltia.png"},
+{title:"Impostos reials",effect:"Camperols paguen més",flavour:"El rei sempre cobra",img:"Impostos.png"},
+{title:"Guerra",effect:"Alguns perden recursos",flavour:"La guerra ho canvia tot",img:"Guerra.png"},
+{title:"Collita excel·lent",effect:"+2 menjar camperols",flavour:"La terra respon",img:"Collita.png"},
+{title:"Ajuda del clergat",effect:"Reparteixen menjar",flavour:"La fe ajuda",img:"Clergat.png"},
+{title:"Rebel·lió camperola",effect:"No paguen impostos",flavour:"Ja n’hi ha prou",img:"Rebelio.png"},
+{title:"Festa al regne",effect:"+1 felicitat tots",flavour:"Tots celebren",img:"Festa.png"},
+{title:"Any de caos",effect:"Tot passa",flavour:"El pitjor any",img:"Caos.png"},
+{title:"Traïció",effect:"Roba un recurs",flavour:"Confia... si pots",img:"Traicio.png"}
+];
+
+function draw(){
+  const card = cards[Math.floor(Math.random()*cards.length)];
+  const el = document.getElementById("card");
+  const img = document.getElementById("cardImage");
+
+  el.classList.add("flip");
+  document.getElementById("sound").play();
+
+  setTimeout(()=>{
+    img.src = card.img;
+    img.style.display = "block";
+    document.querySelector(".title").textContent = card.title;
+    document.querySelector(".effect").textContent = card.effect;
+    document.querySelector(".flavour").textContent = `"${card.flavour}"`;
+    el.classList.remove("flip");
+  },300);
+}
+</script>
+
+</body>
+</html>

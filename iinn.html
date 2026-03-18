@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Fonts modernes -->
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<title>Carta Medieval</title>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Fons general */
+body {
+    background: #0d0d0d;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* CONTENIDOR FULL WIDTH */
+.card {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* IMATGE */
+.card-img {
+    width: 100%;
+    height: 60vh;
+    object-fit: cover;
+}
+
+/* CONTINGUT */
+.card-content {
+    padding: 30px;
+}
+
+/* TÍTOL */
+.title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 60px;
+    letter-spacing: 3px;
+    color: #ffcc00;
+}
+
+/* SUBTÍTOL */
+.subtitle {
+    font-size: 20px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+/* DESCRIPCIÓ */
+.description {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+/* STATS */
+.stats {
+    display: flex;
+    justify-content: space-around;
+    background: #1a1a1a;
+    padding: 20px;
+    border-top: 3px solid #ffcc00;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #ffcc00;
+}
+
+.stat-label {
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <!-- IMATGE -->
+    <img src="carta1.jpg" class="card-img">
+
+    <!-- CONTINGUT -->
+    <div class="card-content">
+        
+        <div class="title">TRAÏCIÓ</div>
+        <div class="subtitle">Carta de crisi</div>
+
+        <div class="description">
+            Un aliat es torna contra tu en el pitjor moment possible. 
+            Perd recursos i confiança. 
+            Ningú està segur en aquest regne.
+        </div>
+
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-value">-3</div>
+            <div class="stat-label">Or</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">-2</div>
+            <div class="stat-label">Influència</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">1</div>
+            <div class="stat-label">Torn</div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

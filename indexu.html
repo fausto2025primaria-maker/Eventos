@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Llançador Medieval ULTRA PRO V6</title>
+<style>
+:root{
+  --bg:#120a06;
+  --panel:#24150d;
+  --gold:#c9a24d;
+  --text:#f6ebd0;
+  --muted:#d8c7a0;
+  --danger:#9e2f22;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  min-height:100vh;
+  background:radial-gradient(circle at top, #2a1710 0%, #120a06 50%, #090503 100%);
+  font-family:Georgia, serif;
+  color:var(--text);
+  text-align:center;
+}
+
+h1{
+  margin:18px 12px 8px;
+  font-size:clamp(1.8rem, 3vw, 2.7rem);
+  letter-spacing:.5px;
+}
+
+.subtitle{
+  color:var(--muted);
+  margin:0 14px 14px;
+  font-size:1rem;
+}
+
+.container{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:0 12px 24px;
+}
+
+.topbar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+  margin:0 0 10px;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(201,162,77,.35);
+  border-radius:999px;
+  padding:8px 14px;
+  color:var(--text);
+  font-size:.95rem;
+}
+
+.flip-card{
+  background:transparent;
+  width:min(92vw, 800px);
+  aspect-ratio: 800 / 1100;
+  perspective:1400px;
+  margin:12px auto 14px;
+}
+
+.flip-card-inner{
+  position:relative;
+  width:100%;
+  height:100%;
+  text-align:center;
+  transition:transform 0.95s ease;
+  transform-style:preserve-3d;
+}
+
+.flip-card.flipped .flip-card-inner{ transform:rotateY(180deg); }
+.flip-card.shake .flip-card-inner{ animation:shakeCard .25s linear 2; }
+
+@keyframes shakeCard{
+  0%{transform:translateX(0);} 25%{transform:translateX(-6px);} 50%{transform:translateX(6px);} 75%{transform:translateX(-4px);} 100%{transform:translateX(0);} }
+
+.flip-card-front,
+.flip-card-back{
+  position:absolute;
+  width:100%;
+  height:100%;
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+  border-radius:22px;
+  overflow:hidden;
+  box-shadow:0 18px 50px rgba(0,0,0,.52);
+  border:4px solid var(--gold);
+}
+
+.flip-card-front{
+  background:#f4e7c2;
+  color:#2b1b12;
+  transform:rotateY(180deg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+
+.flip-card-front img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:#f4e7c2;
+}
+
+.flip-card-front::after{
+  content:"";
+  position:absolute;
+  inset:auto 0 0 0;
+  height:18%;
+  background:linear-gradient(to top, rgba(0,0,0,.22), transparent);
+  pointer-events:none;
+}
+
+.flip-card-back{
+  background-image:url('Dorso.jpg');
+  background-size:cover;
+  background-position:center;
+  position:relative;
+}
+
+.flip-card-back::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.22) 45%, transparent 70%);
+  transform:translateX(-120%);
+  animation:shine 3.4s linear infinite;
+  pointer-events:none;
+}
+
+@keyframes shine{ 0%{transform:translateX(-120%);} 100%{transform:translateX(120%);} }
+
+.overlay-info{
+  width:min(92vw, 800px);
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:0 auto 14px;
+}
+
+.info-box{
+  flex:1 1 220px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(201,162,77,.28);
+  border-radius:16px;
+  padding:10px 14px;
+  text-align:left;
+}
+
+.info-label{
+  color:#d8b66a;
+  font-size:.86rem;
+  margin-bottom:4px;
+  text-transform:uppercase;
+  letter-spacing:.8px;
+}
+
+.info-value{
+  font-size:1.06rem;
+}
+
+.buttons{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin:6px 0 12px;
+}
+
+button{
+  padding:14px 20px;
+  font-size:1.05rem;
+  background:linear-gradient(180deg, #a63225, #7d2119);
+  color:white;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;
+  cursor:pointer;
+  min-width:180px;
+  box-shadow:0 8px 20px rgba(0,0,0,.22);
+}
+
+button:hover{ filter:brightness(1.08); }
+button.secondary{ background:linear-gradient(180deg, #70563a, #4f3925); }
+button.ghost{ background:linear-gradient(180deg, #38424e, #26303a); }
+
+.status{
+  width:min(92vw, 800px);
+  margin:0 auto 10px;
+  font-size:1rem;
+  color:var(--text);
+  min-height:1.4em;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(201,162,77,.25);
+  border-radius:14px;
+  padding:12px 14px;
+}
+
+small.help{
+  display:block;
+  color:var(--muted);
+  margin-top:6px;
+}
+
+@media (max-width: 650px){
+  .overlay-info{gap:8px;}
+  .info-box{padding:9px 12px;}
+  button{min-width:150px; padding:12px 14px; font-size:.98rem;}
+  .badge{font-size:.88rem;}
+}
+</style>
+</head>
+<body>
+<h1>🎴 Cartes d’esdeveniment</h1>
+<p class="subtitle">V6 · càrrega robusta d’imatges, tipus de carta i missatges d’error útils</p>
+
+<div class="container">
+  <div class="topbar">
+    <div class="badge">🛡️ Dors: <strong>Dorso.jpg</strong></div>
+    <div class="badge">🎲 Sense repetir la mateixa carta seguida</div>
+  </div>
+
+  <div class="flip-card" id="flipCard">
+    <div class="flip-card-inner">
+      <div class="flip-card-front" id="cardFront">
+        <img id="cardImage" src="" alt="Carta medieval">
+      </div>
+      <div class="flip-card-back"></div>
+    </div>
+  </div>
+
+  <div class="overlay-info">
+    <div class="info-box">
+      <div class="info-label">Carta</div>
+      <div class="info-value" id="cardName">Cap encara</div>
+    </div>
+    <div class="info-box">
+      <div class="info-label">Tipus</div>
+      <div class="info-value" id="cardType">—</div>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button onclick="draw()">🎴 Llançar carta</button>
+    <button class="secondary" onclick="showBack()">↩️ Tornar al dors</button>
+    <button class="ghost" onclick="toggleFullscreen()">⛶ Pantalla completa</button>
+  </div>
+
+  <div class="status" id="status">Esperant la primera carta...<small class="help">Les imatges han d’estar a la mateixa carpeta que este HTML.</small></div>
+</div>
+
+<audio id="sound" src="flip.mp3"></audio>
+
+<script>
+const cards = [
+  {img:["Hivern.png","Hivern.jpg","hivern.png","hivern.jpg"], nom:"Hivern dur", tipus:"Crisi"},
+  {img:["Malaltia.png","Malaltia.jpg","malaltia.png","malaltia.jpg"], nom:"Malaltia", tipus:"Crisi"},
+  {img:["Impostos.png","Impostos.jpg","impostos.png","impostos.jpg"], nom:"Impostos reials", tipus:"Economia"},
+  {img:["Guerra.png","Guerra.jpg","guerra.png","guerra.jpg"], nom:"Guerra", tipus:"Conflicte"},
+  {img:["Collita.png","Collita.jpg","collita.png","collita.jpg"], nom:"Collita excel·lent", tipus:"Economia"},
+  {img:["Clergat.png","Clergat.jpg","clergat.png","clergat.jpg"], nom:"Ajuda del clergat", tipus:"Societat"},
+  {img:["Rebelio.png","Rebelio.jpg","rebelio.png","rebelio.jpg"], nom:"Rebel·lió camperola", tipus:"Crisi"},
+  {img:["Festa.png","Festa.jpg","festa.png","festa.jpg"], nom:"Festa al regne", tipus:"Societat"},
+  {img:["Caos.png","Caos.jpg","caos.png","caos.jpg"], nom:"Any de caos", tipus:"Crisi"},
+  {img:["Traicio.png","Traicio.jpg","traicio.png","traicio.jpg"], nom:"Traïció", tipus:"Intriga"},
+  {img:["Mercat.png","Mercat.jpg","mercat.png","mercat.jpg"], nom:"Mercat", tipus:"Economia"},
+  {img:["Noble.png","Noble.jpg","noble.png","noble.jpg"], nom:"Permanença del noble", tipus:"Política"}
+];
+
+const flipCard = document.getElementById("flipCard");
+const cardImage = document.getElementById("cardImage");
+const cardName = document.getElementById("cardName");
+const cardType = document.getElementById("cardType");
+const statusText = document.getElementById("status");
+const sound = document.getElementById("sound");
+let lastIndex = -1;
+
+function getRandomCardIndex(){
+  if(cards.length <= 1) return 0;
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * cards.length);
+  } while (idx === lastIndex);
+  lastIndex = idx;
+  return idx;
+}
+
+function playSound(){
+  try {
+    sound.currentTime = 0;
+    sound.play();
+  } catch(e) {}
+}
+
+function carregarImatge(possibles){
+  return new Promise((resolve, reject) => {
+    let i = 0;
+
+    function prova(){
+      if(i >= possibles.length){
+        reject(new Error("No s'ha trobat cap imatge vàlida"));
+        return;
+      }
+
+      const ruta = possibles[i++];
+      const testImg = new Image();
+      testImg.onload = () => resolve(ruta);
+      testImg.onerror = () => prova();
+      testImg.src = ruta;
+    }
+
+    prova();
+  });
+}
+
+async function draw(){
+  const c = cards[getRandomCardIndex()];
+
+  flipCard.classList.remove("flipped");
+  flipCard.classList.add("shake");
+  statusText.innerHTML = "Buscant imatge per a: <strong>" + c.nom + "</strong>...";
+
+  setTimeout(async () => {
+    flipCard.classList.remove("shake");
+
+    try{
+      const rutaFinal = await carregarImatge(c.img);
+      cardImage.src = rutaFinal;
+      cardImage.alt = c.nom;
+      cardName.textContent = c.nom;
+      cardType.textContent = c.tipus;
+      statusText.innerHTML = "Carta actual: <strong>" + c.nom + "</strong> · Arxiu carregat: <strong>" + rutaFinal + "</strong>";
+      playSound();
+      flipCard.classList.add("flipped");
+    }catch(err){
+      cardName.textContent = c.nom;
+      cardType.textContent = c.tipus;
+      statusText.innerHTML = "No s'ha pogut carregar la carta <strong>" + c.nom + "</strong>. He provat: <strong>" + c.img.join(", ") + "</strong>";
+    }
+  }, 350);
+}
+
+function showBack(){
+  flipCard.classList.remove("flipped");
+  statusText.innerHTML = "Has tornat al dors de la carta.";
+}
+
+function toggleFullscreen(){
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.();
+  } else {
+    document.exitFullscreen?.();
+  }
+}
+</script>
+</body>
+</html>

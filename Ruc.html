@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sant Marcel·lí Medieval</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0d12;
+  --bg2:#101625;
+  --panel:#121925;
+  --text:#f4f7fb;
+  --muted:#aeb8c6;
+  --gold:#f0c46a;
+  --edge:rgba(255,255,255,.08);
+  --chip:rgba(255,255,255,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;background:radial-gradient(circle at top,#1a2640 0%,var(--bg) 58%);color:var(--text);font-family:'Inter',system-ui,sans-serif}
+body{min-height:100vh}
+.app{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:10px 14px;background:rgba(9,12,18,.82);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--edge)
+}
+.brand{min-width:0}
+.brand small{
+  display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.16em;
+  color:#90b7ff;font-weight:800;margin-bottom:2px
+}
+.brand h1{
+  margin:0;font-family:'Cinzel',serif;font-size:clamp(1.1rem,2vw,1.8rem);font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.controls{display:flex;gap:8px;align-items:center}
+.btn{
+  border:1px solid var(--edge);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+  color:var(--text);height:40px;min-width:40px;border-radius:12px;cursor:pointer;
+  display:grid;place-items:center;padding:0 12px;font-weight:800;font-family:inherit;
+  transition:transform .16s ease, border-color .16s ease, background .16s ease
+}
+.btn:hover{transform:translateY(-1px);border-color:rgba(240,196,106,.35)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{
+  background:linear-gradient(135deg,#f0c46a,#ff9d64);
+  color:#18120f;border:none;padding:0 16px
+}
+.board{
+  display:grid;grid-template-columns:minmax(0,3fr) minmax(260px,1fr);
+  min-height:0
+}
+.visual{
+  position:relative;min-height:320px;background:#080b11;overflow:hidden
+}
+.visual::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(0,0,0,.04) 0%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.4) 100%);
+  pointer-events:none
+}
+.card-image{
+  width:100%;height:100%;display:block;object-fit:cover;transform:scale(1.01);
+  transition:filter .28s ease, transform .45s ease, opacity .28s ease
+}
+.visual.reveal .card-image{filter:blur(8px) brightness(.75);opacity:.62;transform:scale(1.05)}
+.stats-line{
+  position:absolute;top:12px;left:12px;right:12px;z-index:3;
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-start
+}
+.pill{
+  display:flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;
+  background:rgba(9,12,18,.72);border:1px solid var(--edge);backdrop-filter:blur(8px);
+  font-weight:800;font-size:.92rem
+}
+.pill .lab{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.val.pos{color:#7fe1a0}
+.val.neg{color:#ff8b8b}
+.val.neu{color:#dbe3ee}
+.toast{
+  position:absolute;left:16px;bottom:16px;z-index:3;
+  background:rgba(9,12,18,.82);border:1px solid rgba(240,196,106,.24);border-radius:12px;
+  padding:9px 12px;font-size:.85rem;font-weight:700;opacity:0;transform:translateY(8px);
+  transition:all .22s ease
+}
+.toast.show{opacity:1;transform:translateY(0)}
+.panel{
+  background:linear-gradient(180deg,#182131 0%,var(--panel) 100%);
+  border-left:1px solid var(--edge);padding:18px 18px 16px;
+  display:flex;flex-direction:column;justify-content:space-between;gap:16px;min-height:0
+}
+.type-chip{
+  display:inline-flex;align-self:flex-start;padding:7px 11px;border-radius:999px;
+  font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.1);background:var(--chip);color:var(--gold)
+}
+.card-title{
+  margin:8px 0 10px;font-family:'Cinzel',serif;font-size:clamp(1.8rem,3.2vw,3rem);line-height:.95
+}
+.effect{margin:0 0 12px;font-size:clamp(1rem,1.2vw,1.12rem);line-height:1.45;font-weight:700}
+.flavour{
+  margin:0;color:var(--muted);font-style:italic;line-height:1.5;
+  padding-left:12px;border-left:3px solid rgba(240,196,106,.25)
+}
+.meta{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px
+}
+.meta-card{
+  padding:11px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+  border-radius:14px
+}
+.meta-card .k{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800;margin-bottom:5px}
+.meta-card .v{font-size:.95rem;font-weight:800}
+.history-wrap{
+  padding:8px 12px 10px;background:rgba(9,12,18,.78);backdrop-filter:blur(10px);
+  border-top:1px solid var(--edge)
+}
+.history-head{
+  display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:7px
+}
+.history-head .t{font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.history-head .h{font-size:.76rem;color:#90a1bb}
+.history{
+  display:flex;gap:8px;overflow:auto;padding-bottom:2px;scrollbar-width:thin
+}
+.history-item{
+  min-width:132px;display:grid;grid-template-columns:50px 1fr;gap:8px;align-items:center;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+  border-radius:12px;padding:6px
+}
+.history-item img{width:50px;height:50px;border-radius:9px;object-fit:cover;display:block}
+.h-title{font-size:.82rem;font-weight:800;line-height:1.02;margin-bottom:3px}
+.h-type{font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+.theme-crisi .type-chip,.theme-crisi .h-type{color:#ff8b8b}
+.theme-economia .type-chip,.theme-economia .h-type{color:#f0c46a}
+.theme-festa .type-chip,.theme-festa .h-type{color:#d2a0ff}
+.theme-guerra .type-chip,.theme-guerra .h-type{color:#92b9ff}
+.theme-malaltia .type-chip,.theme-malaltia .h-type{color:#93d8a3}
+.theme-especial .type-chip,.theme-especial .h-type{color:#8fd6ff}
+@media (max-width: 900px){
+  .board{grid-template-columns:1fr;grid-template-rows:minmax(42vh,50vh) auto}
+  .panel{border-left:none;border-top:1px solid var(--edge)}
+}
+@media (max-width: 640px){
+  .topbar{padding:8px 10px}
+  .brand small{display:none}
+  .btn{height:36px;min-width:36px;border-radius:10px}
+  .btn.primary{padding:0 12px}
+  .btn.primary span{display:none}
+  .stats-line{top:10px;left:10px;right:10px;gap:6px}
+  .pill{padding:6px 9px;font-size:.85rem}
+  .pill .lab{display:none}
+  .meta{grid-template-columns:1fr}
+  .history-head .h{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app" id="appRoot">
+  <div class="topbar">
+    <div class="brand">
+      <small>Carta interactiva</small>
+      <h1>Sant Marcel·lí Medieval</h1>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="toggleFullscreen()" title="Pantalla completa">⛶</button>
+      <button class="btn" onclick="resetDeck()" title="Reiniciar">↺</button>
+      <button class="btn primary" onclick="drawCard()" title="Llançar"><span>🎴 Llançar</span></button>
+    </div>
+  </div>
+
+  <div class="board" id="board">
+    <section class="visual" id="visual">
+      <div class="stats-line">
+        <div class="pill"><span>🍞</span><span class="lab">Menjar</span><span class="val pos" id="food">+3</span></div>
+        <div class="pill"><span>⚔️</span><span class="lab">Força</span><span class="val neu" id="strength">+0</span></div>
+        <div class="pill"><span>💰</span><span class="lab">Diners</span><span class="val pos" id="money">+2</span></div>
+        <div class="pill"><span>😊</span><span class="lab">Felicitat</span><span class="val pos" id="happiness">+2</span></div>
+      </div>
+      <img class="card-image" id="cardImage" src="Collita.jpeg" alt="Carta Sant Marcel·lí Medieval">
+      <div class="toast" id="toast">Carta llançada</div>
+    </section>
+
+    <aside class="panel" id="panel">
+      <div>
+        <div class="type-chip" id="typeChip">Economia</div>
+        <h2 class="card-title" id="cardTitle">Collita</h2>
+        <p class="effect" id="effect">Una bona collita ompli el barri de productes, intercanvis i esperança per als pròxims dies.</p>
+        <p class="flavour" id="flavour">“La terra recompensa el treball compartit.”</p>
+      </div>
+      <div class="meta">
+        <div class="meta-card">
+          <div class="k">Carta</div>
+          <div class="v" id="cardName">Collita</div>
+        </div>
+        <div class="meta-card">
+          <div class="k">Deck</div>
+          <div class="v" id="deckCounter">1 / 27</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="history-wrap">
+    <div class="history-head">
+      <div class="t">Historial recent</div>
+      <div class="h">Espai = llançar · F = pantalla · R = reiniciar</div>
+    </div>
+    <div class="history" id="history"></div>
+  </div>
+</div>
+
+<audio id="sound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-fast-paper-flip-1530.mp3"></audio>
+
+<script>
+const fallbackSvg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="%23131b27"/><stop offset="1" stop-color="%23090d14"/></linearGradient></defs><rect width="1200" height="800" fill="url(%23g)"/><text x="600" y="380" text-anchor="middle" fill="%23f0c46a" font-size="62" font-family="Arial" font-weight="700">No s\\'ha trobat la imatge</text><text x="600" y="452" text-anchor="middle" fill="%23d9e0eb" font-size="30" font-family="Arial">Comprova que el nom coincidisca exactament amb el repositori</text></svg>';
+
+const cards = [
+  {key:'Collita',type:'Economia',theme:'economia',image:'Collita.jpeg',effect:'Una bona collita ompli el barri de productes, intercanvis i esperança per als pròxims dies.',flavour:'La terra recompensa el treball compartit.',stats:{food:'+3',strength:'+0',money:'+2',happiness:'+2'}},
+  {key:'Impostos',type:'Crisi',theme:'crisi',image:'Impostos.jpeg',effect:'Arriben nous impostos i moltes famílies han de retallar despeses per a poder resistir.',flavour:'Quan puja el tribut, baixa l’alegria.',stats:{food:'-1',strength:'+0',money:'-3',happiness:'-2'}},
+  {key:'Festa',type:'Celebració',theme:'festa',image:'Festa.jpeg',effect:'Una gran festa ompli la plaça de música, taules parades i rialles per tot el veïnat.',flavour:'Quan el poble celebra, fins les pedres somriuen.',stats:{food:'-1',strength:'+0',money:'-1',happiness:'+4'}},
+  {key:'Guerra',type:'Guerra',theme:'guerra',image:'Guerra.jpeg',effect:'Els guardians preparen la defensa del poble i reforcen la vigilància als punts més febles.',flavour:'La calma també necessita espases.',stats:{food:'-1',strength:'+3',money:'-2',happiness:'+0'}},
+  {key:'Traïció',type:'Crisi',theme:'crisi',image:'Traicio.jpeg',effect:'Una traïció dins del consell complica el comerç, debilita l’ordre i enfonsa la moral.',flavour:'No totes les dagues es veuen abans de colpejar.',stats:{food:'-1',strength:'-1',money:'-2',happiness:'-3'}},
+  {key:'Decret',type:'Govern',theme:'economia',image:'Decret.jpeg',effect:'Un decret inesperat reorganitza el mercat i obliga el poble a adaptar-se ràpidament.',flavour:'La llei canvia abans que les persones la comprenguen.',stats:{food:'+0',strength:'+1',money:'-1',happiness:'-1'}},
+  {key:'Rebel·lió',type:'Crisi',theme:'crisi',image:'Rebelio.jpeg',effect:'Una rebel·lió esclata als carrers i tot el barri entra en dies d’incertesa i tensió.',flavour:'Quan la ràbia parla, el ferro escolta.',stats:{food:'-2',strength:'-2',money:'-2',happiness:'-4'}},
+  {key:'Malaltia',type:'Malaltia',theme:'malaltia',image:'Malaltia.jpeg',effect:'La malaltia s’estén i obliga a gastar recursos mentre el veïnat perd energia i confiança.',flavour:'A voltes l’enemic no porta armadura.',stats:{food:'-2',strength:'-1',money:'-1',happiness:'-3'}},
+  {key:'Èxode rural',type:'Crisi',theme:'crisi',image:'Exode.jpeg',effect:'Moltes famílies abandonen el camp buscant millors oportunitats. Els camps queden buits i la producció cau.',flavour:'Quan la terra deixa de donar, el poble camina.',stats:{food:'-2',strength:'-1',money:'-2',happiness:'-1'}},
+  {key:'Collita pobra',type:'Crisi',theme:'crisi',image:'CollitaPobra.jpeg',effect:'La terra no ha donat el que s’esperava. Els graners queden mig buits i el poble comença a preocupar-se.',flavour:'La terra parla… i hui ho fa en silenci.',stats:{food:'-3',strength:'-1',money:'-1',happiness:'-2'}},
+  {key:'Naixen cries',type:'Positiu',theme:'festa',image:'NaixenCries.jpeg',effect:'Naixen noves criatures al poble. El futur creix, encara que també caldrà alimentar més boques.',flavour:'Cada nova vida és una promesa… i una responsabilitat.',stats:{food:'-1',strength:'+1',money:'-1',happiness:'+3'}},
+  {key:'Rebaixa d’impostos',type:'Positiu',theme:'economia',image:'RebaixaImpostos.jpeg',effect:'El rei anuncia una rebaixa d’impostos. El poble respira i augmenta el consum i la tranquil·litat.',flavour:'Quan baixa el tribut, puja l’esperança.',stats:{food:'+1',strength:'+0',money:'-2',happiness:'+3'}},
+  {key:'Impostos abusius',type:'Crisi',theme:'crisi',image:'ImpostosAbusius.jpeg',effect:'Els impostos augmenten de forma abusiva. Les famílies tenen dificultats per sobreviure.',flavour:'El pes dels tributs ofega el poble.',stats:{food:'-1',strength:'-1',money:'+3',happiness:'-3'}},
+  {key:'Inversió en terres',type:'Positiu',theme:'economia',image:'InversioTerres.jpeg',effect:'Els nobles inverteixen en terres i milloren els camps, augmentant la producció.',flavour:'Quan la terra es cuida, el poble creix.',stats:{food:'+2',strength:'+0',money:'+1',happiness:'+1'}},
+  {key:'Abusos senyorials',type:'Crisi',theme:'crisi',image:'AbusosSenyorials.jpeg',effect:'Els senyors feudals abusen del seu poder i exploten el poble.',flavour:'El poder sense límit porta patiment.',stats:{food:'-1',strength:'-1',money:'+1',happiness:'-3'}},
+  {key:'Entrenament militar',type:'Guerra',theme:'guerra',image:'EntrenamentMilitar.jpeg',effect:'Els soldats entrenen i milloren les seues habilitats de combat.',flavour:'La disciplina fa forts els qui la practiquen.',stats:{food:'-1',strength:'+3',money:'-1',happiness:'+0'}},
+  {key:'Bandolers armats',type:'Crisi',theme:'crisi',image:'Bandolers.jpeg',effect:'Grups de bandolers ataquen els camins i roben mercaderies.',flavour:'En camins foscos, ningú està segur.',stats:{food:'-1',strength:'-2',money:'-2',happiness:'-1'}},
+  {key:'Festivitat religiosa',type:'Celebració',theme:'festa',image:'FestivitatReligiosa.jpeg',effect:'Una gran festivitat religiosa uneix el poble amb celebracions i rituals.',flavour:'La fe també alimenta l’esperit.',stats:{food:'-1',strength:'+0',money:'-1',happiness:'+4'}},
+  {key:'Edat d’Or',type:'Especial',theme:'especial',image:'EdatOr.jpeg',effect:'Una etapa de prosperitat inesperada ompli el poble de recursos, confiança i oportunitats.',flavour:'Durant un temps, tot pareix possible.',stats:{food:'+2',strength:'+2',money:'+2',happiness:'+3'}},
+  {key:'Plaga Negra',type:'Especial',theme:'especial',image:'PlagaNegra.jpeg',effect:'Una plaga s’estén ràpidament i colpeja totes les famílies del poble.',flavour:'Quan la malaltia entra per la porta, el silenci ompli les cases.',stats:{food:'-2',strength:'-3',money:'-2',happiness:'-3'}},
+  {key:'Heroi del poble',type:'Especial',theme:'especial',image:'HeroiPoble.jpeg',effect:'Un heroi local inspira el poble i organitza la defensa i l’ajuda entre veïns.',flavour:'A voltes, una sola persona encén la força de tots.',stats:{food:'+0',strength:'+3',money:'+0',happiness:'+3'}},
+  {key:'Incendi',type:'Especial',theme:'especial',image:'Incendi.jpeg',effect:'Un incendi arrasa part del poble i es perden magatzems, cases i mercaderies.',flavour:'El foc no pregunta de qui és cada sostre.',stats:{food:'-2',strength:'-1',money:'-3',happiness:'-2'}},
+  {key:'Gran Mercat',type:'Especial',theme:'especial',image:'GranMercat.jpeg',effect:'Arriba un gran mercat de fora i el poble ven productes, compra eines i fa nous contactes.',flavour:'Quan el camí s’obri, també s’obri la fortuna.',stats:{food:'+1',strength:'+0',money:'+4',happiness:'+2'}},
+  {key:'Sequera',type:'Especial',theme:'especial',image:'Sequera.jpeg',effect:'Una gran sequera asseca els camps i posa en perill les reserves de menjar.',flavour:'Sense aigua, la terra només recorda el que va ser.',stats:{food:'-4',strength:'-1',money:'-1',happiness:'-2'}},
+  {key:'Pau',type:'Especial',theme:'especial',image:'Pau.jpeg',effect:'Es signa una pau inesperada i el poble recupera la calma després de temps difícils.',flavour:'La millor victòria és la que evita més tombes.',stats:{food:'+1',strength:'+1',money:'+1',happiness:'+4'}},
+  {key:'Visita reial',type:'Especial',theme:'especial',image:'VisitaReial.jpeg',effect:'Una visita reial porta prestigi, activitat i obligacions extraordinàries al poble.',flavour:'Quan arriba la corona, res no queda igual.',stats:{food:'-1',strength:'+1',money:'+2',happiness:'+2'}},
+  {key:'Saqueig',type:'Especial',theme:'especial',image:'Saqueig.jpeg',effect:'Uns saquejadors ataquen de nit i s’enduen animals, eines i provisions.',flavour:'La foscor també té mans.',stats:{food:'-2',strength:'-2',money:'-3',happiness:'-2'}},
+  {key:'Nova Font',type:'Especial',theme:'especial',image:'NovaFont.jpeg',effect:'El poble troba una nova font d’aigua i milloren les collites i la vida diària.',flavour:'On brolla l’aigua, renaix l’esperança.',stats:{food:'+3',strength:'+0',money:'+1',happiness:'+2'}}
+];
+
+let deck = [];
+let history = [];
+
+function valueClass(v){
+  if(String(v).startsWith('+') && String(v) !== '+0') return 'pos';
+  if(String(v).startsWith('-')) return 'neg';
+  return 'neu';
+}
+
+function setImage(filename){
+  const img = document.getElementById('cardImage');
+  img.onerror = () => { img.onerror = null; img.src = fallbackSvg; };
+  img.src = filename;
+}
+
+function renderHistory(){
+  const wrap = document.getElementById('history');
+  wrap.innerHTML = '';
+  history.slice(0,6).forEach(card => {
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.innerHTML = `<img src="${card.image}" alt="${card.key}" onerror="this.src='${fallbackSvg}'"><div><div class="h-title">${card.key}</div><div class="h-type">${card.type}</div></div>`;
+    wrap.appendChild(item);
+  });
+}
+
+function applyTheme(theme){
+  const app = document.getElementById('appRoot');
+  app.className = 'app theme-' + theme;
+}
+
+function updateUI(card){
+  applyTheme(card.theme);
+  document.getElementById('typeChip').textContent = card.type;
+  document.getElementById('cardTitle').textContent = card.key;
+  document.getElementById('cardName').textContent = card.key;
+  document.getElementById('effect').textContent = card.effect;
+  document.getElementById('flavour').textContent = '“' + card.flavour + '”';
+
+  const food = document.getElementById('food');
+  const strength = document.getElementById('strength');
+  const money = document.getElementById('money');
+  const happiness = document.getElementById('happiness');
+
+  food.textContent = card.stats.food; food.className = 'val ' + valueClass(card.stats.food);
+  strength.textContent = card.stats.strength; strength.className = 'val ' + valueClass(card.stats.strength);
+  money.textContent = card.stats.money; money.className = 'val ' + valueClass(card.stats.money);
+  happiness.textContent = card.stats.happiness; happiness.className = 'val ' + valueClass(card.stats.happiness);
+
+  document.getElementById('deckCounter').textContent = `${cards.length - deck.length} / ${cards.length}`;
+  setImage(card.image);
+
+  history.unshift(card);
+  renderHistory();
+
+  const toast = document.getElementById('toast');
+  toast.textContent = card.type + ': ' + card.key;
+  toast.classList.add('show');
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => toast.classList.remove('show'), 1400);
+
+  const sound = document.getElementById('sound');
+  sound.currentTime = 0;
+  sound.play().catch(() => {});
+}
+
+function drawCard(){
+  try{
+    const visual = document.getElementById('visual');
+    if(deck.length === 0) deck = [...cards];
+    visual.classList.add('reveal');
+
+    setTimeout(() => {
+      const index = Math.floor(Math.random() * deck.length);
+      const card = deck.splice(index, 1)[0];
+      updateUI(card);
+      visual.classList.remove('reveal');
+    }, 220);
+  }catch(e){
+    console.error(e);
+    deck = [...cards];
+  }
+}
+
+function resetDeck(){
+  deck = [...cards];
+  history = [];
+  renderHistory();
+  updateUI(cards[0]);
+  document.getElementById('deckCounter').textContent = `1 / ${cards.length}`;
+}
+
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    (document.documentElement.requestFullscreen || document.body.requestFullscreen)?.call(document.documentElement);
+  }else{
+    document.exitFullscreen?.();
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  if(k === ' '){
+    e.preventDefault();
+    drawCard();
+  }else if(k === 'f'){
+    toggleFullscreen();
+  }else if(k === 'r'){
+    resetDeck();
+  }
+});
+
+document.addEventListener('fullscreenchange', () => {
+  document.body.classList.toggle('fullscreen-mode', !!document.fullscreenElement);
+});
+
+deck = [...cards];
+updateUI(cards[0]);
+</script>
+</body>
+</html>
